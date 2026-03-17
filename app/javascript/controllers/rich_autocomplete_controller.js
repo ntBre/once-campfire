@@ -4,7 +4,7 @@ import EmojiAutocompleteHandler from "lib/autocomplete/emoji_autocomplete_handle
 import { debounce } from "helpers/timing_helpers"
 
 export default class extends Controller {
-  static values = { url: String }
+  static values = { url: String, emojiUrl: String }
 
   initialize() {
     this.handlers = []
@@ -35,7 +35,7 @@ export default class extends Controller {
     this.#uninstallHandlers()
     this.handlers = [
       new MentionsAutocompleteHandler(this.element, this.urlValue),
-      new EmojiAutocompleteHandler(this.element)
+      new EmojiAutocompleteHandler(this.element, this.emojiUrlValue)
     ]
   }
 
