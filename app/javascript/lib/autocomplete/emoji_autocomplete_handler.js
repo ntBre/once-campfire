@@ -6,14 +6,12 @@ import { Renderer } from "lib/autocomplete/renderer"
 const MAX_RESULTS = 50
 
 export default class extends BaseAutocompleteHandler {
-  #emojiUrl
-  #emojiListPromise
-  #emojiList
-  #renderer
-
   constructor(element, emojiUrl) {
     super(element)
-    this.#emojiUrl = emojiUrl
+    this.emojiUrl = emojiUrl
+    this.emojiListPromise = null
+    this.emojiList = null
+    this.renderer = new Renderer()
   }
 
   get pattern() {
@@ -21,18 +19,18 @@ export default class extends BaseAutocompleteHandler {
   }
 
   loadAutocompletables(_query, callback) {
-    if (this.#emojiList) {
-      this.setAutocompletables(this.#emojiList)
+    if (this.emojiList) {
+      this.setAutocompletables(this.emojiList)
       callback()
       return
     }
 
-    if (!this.#emojiListPromise) {
-      this.#emojiListPromise = this.#fetchEmojiList()
+    if (!this.emojiListPromise) {
+      this.emojiListPromise = this.fetchEmojiList()
     }
 
-    this.#emojiListPromise.then((emojiList) => {
-      this.#emojiList = emojiList
+    this.emojiListPromise.then((emojiList) => {
+      this.emojiList = emojiList
       this.setAutocompletables(emojiList)
       callback()
     })
@@ -46,7 +44,7 @@ export default class extends BaseAutocompleteHandler {
   fetchResultsForQuery(query, callback) {
     this.loadAutocompletables(query, () => {
       const autocompletables = this.autocompletablesMatchingQuery(query).slice(0, MAX_RESULTS)
-      const html = this.#renderer.renderAutocompletableSuggestions(autocompletables)
+      const html = this.renderer.renderAutocompletableSuggestions(autocompletables)
       callback(html)
     })
   }
@@ -75,16 +73,11 @@ export default class extends BaseAutocompleteHandler {
     return rect ? rect : {}
   }
 
-  get #renderer() {
-    if (!this.#renderer) this.#renderer = new Renderer()
-    return this.#renderer
-  }
-
-  async #fetchEmojiList() {
-    if (!this.#emojiUrl) return EMOJI_LIST
+  async fetchEmojiList() {
+    if (!this.emojiUrl) return EMOJI_LIST
 
     try {
-      const response = await fetch(this.#emojiUrl, { credentials: "same-origin" })
+      const response = await fetch(this.emojiUrl, { credentials: "same-origin" })
       if (!response.ok) throw new Error(`Emoji list fetch failed: ${response.status}`)
       const data = await response.json()
       if (!Array.isArray(data) || data.length === 0) return EMOJI_LIST
