@@ -63,6 +63,21 @@ export default class extends Controller {
     }
   }
 
+  insertEmoji(event) {
+    event.preventDefault()
+    const emoji = event.params.emoji
+
+    const editor = this.textTarget.editor
+    const cursorPosition = editor.getSelectedRange()[1]
+
+    editor.recordUndoEntry("Insert emoji")
+    editor.setSelectedRange(cursorPosition)
+    editor.insertString(emoji)
+    editor.setSelectedRange(cursorPosition + emoji.length)
+
+    this.textTarget.focus()
+  }
+
   filePicked(event) {
     for (const file of event.target.files) {
       this.#files.push(file)

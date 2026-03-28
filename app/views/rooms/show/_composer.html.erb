@@ -37,6 +37,27 @@
                   <span class="for-screen-reader">Attach a file</span>
                 </label>
 
+                <%= tag.details class: "position-relative composer__emoji-picker-wrapper",
+                    data: { controller: "popup", action: "keydown.esc->popup#close toggle->popup#toggle click@document->popup#closeOnClickOutside", popup_orientation_top_class: "popup-orientation-top" } do %>
+                  <%= tag.summary class: "btn btn--borderless txt-small flex-item-no-shrink composer__emoji-picker-btn" do %>
+                    <span style: "font-size: 1.3em">😊</span>
+                    <span class: "for-screen-reader">Emoji picker</span>
+                  <% end %>
+
+                  <div class="composer__emoji-picker-menu border shadow" data-popup-target="menu">
+                    <% EmojiHelper::EMOJI_PICKER.each do |category, emojis| %>
+                      <div class="composer__emoji-category">
+                        <h4 class="composer__emoji-category-title"><%= category %></h4>
+                        <div class="composer__emoji-grid">
+                          <% emojis.each do |emoji, title| %>
+                            <%= button_tag emoji, type: "button", title: title, class: "btn composer__emoji-btn", data: { action: "composer#insertEmoji", emoji_value: emoji } %>
+                          <% end %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+
                 <button class="btn btn--borderless txt-small flex-item-no-shrink composer__rich-text-btn" type="button" data-action="composer#toggleToolbar">
                   <%= image_tag "text-options.svg", size: 20, class: "colorize--black", aria: { hidden: "true" } %>
                   <span class="for-screen-reader">Rich text</span>

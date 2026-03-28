@@ -94,8 +94,94 @@
   }
 }
 
+/* Emoji picker */
+.composer__emoji-picker-btn {
+  --hover-filter: brightness(0.85);
+
+  @media (any-hover: hover) {
+    &:where(:not(:active):hover) {
+      filter: var(--hover-filter);
+      box-shadow: none;
+    }
+  }
+}
+
+.composer__emoji-picker-menu {
+  --emoji-picker-max-height: 25rem;
+  --emoji-picker-max-width: 28rem;
+
+  background: var(--color-bg);
+  border-radius: 0.5rem;
+  max-block-size: var(--emoji-picker-max-height);
+  max-inline-size: var(--emoji-picker-max-width);
+  overflow-y: auto;
+  padding: var(--block-space-half);
+  position: absolute;
+  inset-block-start: var(--btn-size);
+  inset-inline-end: 0;
+  z-index: 10;
+
+  @media (max-width: 100ch) {
+    --emoji-picker-max-width: 20rem;
+  }
+}
+
+.composer__emoji-category {
+  margin-block-end: var(--block-space);
+
+  &:last-child {
+    margin-block-end: 0;
+  }
+}
+
+.composer__emoji-category-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text);
+  opacity: 0.6;
+  margin: 0 0 var(--inline-space-half) 0;
+  padding-inline: var(--inline-space-half);
+}
+
+.composer__emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.2rem, 1fr));
+  gap: var(--inline-space-half);
+}
+
+.composer__emoji-btn {
+  --btn-size: 2rem;
+  --btn-border-radius: 0.4rem;
+  --btn-padding: 0;
+
+  aspect-ratio: 1;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  transition: all 200ms ease;
+
+  @media (any-hover: hover) {
+    &:where(:not(:active):hover) {
+      background-color: var(--color-message-bg);
+      border-color: var(--color-border-darker);
+      transform: scale(1.1);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
 @media (min-width: 100ch) and (any-hover: hover) and (pointer: fine) {
-  .composer__rich-text-btn {
+  .composer__emoji-picker-btn {
     display: inline-flex;
   }
 
