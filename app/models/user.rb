@@ -11,6 +11,7 @@ class User < ApplicationRecord
 
   has_many :boosts, dependent: :destroy, foreign_key: :booster_id
   has_many :searches, dependent: :delete_all
+  has_many :custom_emojis, dependent: :restrict_with_exception, foreign_key: :creator_id, inverse_of: :creator
 
   has_many :sessions, dependent: :destroy
   has_many :bans, dependent: :destroy

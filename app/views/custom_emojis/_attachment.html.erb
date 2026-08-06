@@ -1,0 +1,4 @@
+<span class="custom-emoji" title="<%= ":#{custom_emoji.name}:" %>">
+  <%= image_tag custom_emoji_image_path(custom_emoji), class: "custom-emoji__image", alt: "", aria: { hidden: true } %>
+  <span class="for-screen-reader"><%= ":#{custom_emoji.name}:" %></span>
+</span>

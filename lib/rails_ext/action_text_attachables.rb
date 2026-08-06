@@ -6,9 +6,9 @@ ActiveSupport.on_load(:action_text_content) do
       end
 
       private
-        # Our @mentions use ActionText attachments, which are signed. If someone rotates SECRET_KEY_BASE, the existing attachments become invalid.
-        # This allows ignoring invalid signatures for User attachments in ActionText.
-        ATTACHABLES_PERMITTED_WITH_INVALID_SIGNATURES = %w[ User ]
+        # Our mentions and custom emoji use signed ActionText attachments. If someone rotates SECRET_KEY_BASE, existing attachments become invalid.
+        # This allows ignoring invalid signatures for the known-safe attachable models.
+        ATTACHABLES_PERMITTED_WITH_INVALID_SIGNATURES = %w[ CustomEmoji User ]
 
         def attachable_from_possibly_expired_sgid(sgid)
           if message = sgid&.split("--")&.first

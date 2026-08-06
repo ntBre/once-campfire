@@ -1,0 +1,19 @@
+<article id="<%= dom_id(custom_emoji) %>" class="custom-emojis__item fill-shade border-radius pad flex flex-column align-center gap <%= "custom-emojis__item--inactive" unless custom_emoji.active? %>">
+  <%= image_tag custom_emoji_image_path(custom_emoji), class: "custom-emoji__image custom-emojis__preview", alt: ":#{custom_emoji.name}:" %>
+
+  <div class="txt-align-center min-width">
+    <strong class="overflow-ellipsis"><%= ":#{custom_emoji.name}:" %></strong>
+    <div class="txt-small txt-subtle overflow-ellipsis">Added by <%= custom_emoji.creator.name %></div>
+  </div>
+
+  <% if custom_emoji.manageable_by?(Current.user) %>
+    <% if custom_emoji.active? %>
+      <%= button_to "Remove", custom_emoji_path(custom_emoji), method: :delete,
+            class: "btn btn--negative txt-small", data: { turbo_confirm: "Remove :#{custom_emoji.name}: from autocomplete? Existing messages will keep it." } %>
+    <% else %>
+      <%= button_to "Restore", custom_emoji_path(custom_emoji), method: :patch, class: "btn txt-small" %>
+    <% end %>
+  <% elsif !custom_emoji.active? %>
+    <span class="txt-small txt-subtle">Removed</span>
+  <% end %>
+</article>

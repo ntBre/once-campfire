@@ -1,6 +1,8 @@
 class Account < ApplicationRecord
   include Joinable
 
+  has_many :custom_emojis, dependent: :destroy
+
   has_one_attached :logo do |attachable|
     attachable.variant :large, resize_to_limit: [ 512, 512 ], format: :png
     attachable.variant :small, resize_to_limit: [ 192, 192 ], format: :png

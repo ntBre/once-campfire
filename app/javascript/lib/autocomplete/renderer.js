@@ -25,6 +25,15 @@ export class Renderer {
   }
 
   renderAutocompletable(autocompletable) {
+    if (autocompletable.image_url) {
+      return `
+        <button class="autocomplete__btn btn btn--borderless btn--transparent min-width flex-item-grow justify-start" data-value="${autocompletable.value}">
+          <img src="${autocompletable.image_url}" class="autocomplete__emoji-image" alt="">
+          <span class="autocompletable__name">${autocompletable.label || autocompletable.name}</span>
+        </button>
+      `
+    }
+
     if (autocompletable.emoji) {
       return `
         <button class="autocomplete__btn btn btn--borderless btn--transparent min-width flex-item-grow justify-start" data-value="${autocompletable.value}">
