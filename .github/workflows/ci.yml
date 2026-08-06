@@ -6,10 +6,15 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
   scan:
+    name: scan
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,6 +35,7 @@ jobs:
         run: bin/brakeman
 
   lint:
+    name: lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -66,14 +72,16 @@ jobs:
         uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
         with:
           advanced-security: false
+          persona: pedantic
 
   test:
+    name: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
     services:
       redis:
-        image: redis # zizmor: ignore[unpinned-images] -- version tag is fine for service containers
+        image: redis:8.10.0@sha256:344e3945a0b431c8ff1eecd58c5573538126bd756f02fc7e218ddf1fc2546366
         ports:
           - 6379:6379
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
@@ -98,12 +106,13 @@ jobs:
         run: bin/rails db:setup test
 
   test_system:
+    name: test system
     runs-on: ubuntu-latest
     permissions:
       contents: read
     services:
       redis:
-        image: redis # zizmor: ignore[unpinned-images] -- version tag is fine for service containers
+        image: redis:8.10.0@sha256:344e3945a0b431c8ff1eecd58c5573538126bd756f02fc7e218ddf1fc2546366
         ports:
           - 6379:6379
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
