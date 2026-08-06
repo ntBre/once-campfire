@@ -1,0 +1,16 @@
+services:
+  campfire:
+    build:
+      context: .
+      target: development
+    ports:
+      - "3000:80"
+    environment:
+      DISABLE_SSL: "true"
+      SECRET_KEY_BASE: "local-development-only"
+    volumes:
+      - .:/rails
+      - campfire-dev-storage:/rails/storage
+
+volumes:
+  campfire-dev-storage:

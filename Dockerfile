@@ -21,13 +21,16 @@ ENV RAILS_ENV="production" \
     LD_PRELOAD="/usr/local/lib/libjemalloc.so"
 
 
-# Throw-away build stage to reduce size of final image
-FROM base AS build
+# Shared build stage with the packages needed to compile gems
+FROM base AS build-base
 
-# Install packages need to build gems
 RUN apt-get update -qq && \
     apt-get install -y build-essential git pkg-config libyaml-dev libssl-dev && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+
+# Throw-away production build stage to reduce size of final image
+FROM build-base AS build
 
 # Install application gems
 COPY Gemfile Gemfile.lock vendor ./
@@ -40,6 +43,29 @@ COPY . .
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+
+
+# Development image with all gem groups and build tools available
+FROM build-base AS development
+
+ENV RAILS_ENV="development" \
+    BUNDLE_DEPLOYMENT="false" \
+    BUNDLE_WITHOUT=""
+
+COPY Gemfile Gemfile.lock vendor ./
+RUN bundle install
+
+COPY . .
+
+# Match the usual host user ID so bind-mounted files remain editable
+RUN groupadd --system --gid 1000 rails && \
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    mkdir -p /rails/storage && \
+    chown -R rails:rails /rails
+USER 1000:1000
+
+EXPOSE 80
+CMD ["bin/boot"]
 
 
 # Final stage for app image

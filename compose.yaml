@@ -1,0 +1,23 @@
+services:
+  campfire:
+    build:
+      context: .
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - campfire:/rails/storage
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://localhost:3000/up" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  campfire:
+    name: campfire
+    external: true
