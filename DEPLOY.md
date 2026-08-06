@@ -1,25 +1,69 @@
-The docs in the main README are good for setting up and running the Docker
-image. These docs instead cover how to update the image and redeploy, tailored
-to our exact setup.
+# Deploying this Campfire fork
 
-1. Pull changes and rebuild the Docker image
+This deployment builds the current checkout on the server and runs it with
+Docker Compose. Compose replaces the old sequence of manually building,
+stopping, and starting a container.
 
-   ```console
-   $ cd once-campfire
-   $ git pull  # I've left it on brent/main instead of origin/main now
-   $ docker build -t campfire
-   ```
+## One-time setup on the server
 
-2. Shut down the running container with the old image
+Install Docker Engine and the Docker Compose plugin, then confirm both are
+available:
 
-   ```console
-   $ docker ps
-   $ docker stop $CONTAINER_ID
-   ```
+```console
+$ docker version
+$ docker compose version
+```
 
-3. Restart with the new image
+Create the production storage volume. This command is idempotent, so it also
+safely finds the volume named `campfire` from the previous `docker run` setup:
 
-   ```console
-   $ cd
-   $ ./run.sh
-   ```
+```console
+$ docker volume create campfire
+```
+
+Create the server-only environment file and fill in its real values:
+
+```console
+$ cd once-campfire
+$ cp .env.example .env
+$ chmod 600 .env
+$ $EDITOR .env
+```
+
+The `.env` file is intentionally ignored by Git. Keep it on the server and back
+it up securely; in particular, changing `SECRET_KEY_BASE` later invalidates
+existing sessions and signed data.
+
+Start Campfire:
+
+```console
+$ docker compose up --detach --build
+```
+
+`--build` rebuilds the image from the current checkout. `--detach` leaves the
+containers running in the background. The database and uploaded files live in
+the external `campfire` volume and survive container replacement.
+
+## Deploying an update
+
+```console
+$ cd once-campfire
+$ git pull
+$ docker compose up --detach --build
+```
+
+Compose builds the new image and replaces the running container. Campfire runs
+pending database migrations during startup.
+
+Useful operational commands:
+
+```console
+$ docker compose ps
+$ docker compose logs --follow campfire
+$ docker compose exec campfire bin/rails console
+$ docker compose restart campfire
+$ docker compose down
+```
+
+`docker compose down` removes the container and network, but not the external
+`campfire` storage volume. Start it again with `docker compose up --detach`.
