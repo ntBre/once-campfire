@@ -1,0 +1,50 @@
+<% @page_title = "Custom emoji" %>
+
+<% content_for :nav do %>
+  <div class="flex-item-justify-start">
+    <%= link_back_to_last_room_visited %>
+  </div>
+<% end %>
+
+<section class="panel flex flex-column gap custom-emojis">
+  <div>
+    <h1 class="txt-x-large">Custom emoji</h1>
+    <p class="txt-subtle">Upload an image everyone can use by typing its <code>:name:</code>.</p>
+  </div>
+
+  <%= form_with model: @custom_emoji, class: "fill-shade border-radius pad flex flex-column gap" do |form| %>
+    <% if @custom_emoji.errors.any? %>
+      <div class="txt-negative" role="alert">
+        <%= @custom_emoji.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div class="flex align-center gap">
+      <label class="input input--actor flex align-center gap flex-item-grow">
+        <span aria-hidden="true">:</span>
+        <%= form.text_field :name, class: "input", required: true, maxlength: 32,
+              pattern: "[a-zA-Z0-9_]+", placeholder: "party_parrot", autocomplete: "off",
+              aria: { label: "Emoji name" } %>
+        <span aria-hidden="true">:</span>
+      </label>
+
+      <label class="btn input--file">
+        <%= image_tag "camera.svg", aria: { hidden: "true" }, size: 20 %>
+        <%= form.file_field :image, class: "input", required: true, accept: "image/png,image/jpeg,image/webp" %>
+        <span class="for-screen-reader">Choose image</span>
+      </label>
+
+      <%= form.button "Add emoji", class: "btn btn--reversed", type: "submit" %>
+    </div>
+
+    <p class="txt-small txt-subtle margin-none">PNG, JPEG, or WebP; up to 1 MB. Names are converted to lowercase.</p>
+  <% end %>
+
+  <% if @custom_emojis.any? %>
+    <div class="custom-emojis__grid">
+      <%= render @custom_emojis %>
+    </div>
+  <% else %>
+    <div class="fill-shade border-radius pad txt-align-center txt-subtle">No custom emoji yet.</div>
+  <% end %>
+</section>

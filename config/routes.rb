@@ -25,6 +25,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :custom_emojis, only: %i[ index create update destroy ] do
+    scope module: "custom_emojis" do
+      resource :image, only: :show
+    end
+  end
+
   direct :fresh_account_logo do |options|
     route_for :account_logo, v: Current.account&.updated_at&.to_fs(:number), size: options[:size]
   end
@@ -52,6 +58,7 @@ Rails.application.routes.draw do
   end
 
   namespace :autocompletable do
+    resources :custom_emojis, only: :index, defaults: { format: :json }
     resources :users, only: :index
   end
 

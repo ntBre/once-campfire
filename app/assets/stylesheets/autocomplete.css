@@ -19,6 +19,12 @@
   line-height: 1;
 }
 
+.autocomplete__emoji-image {
+  block-size: 1.4em;
+  inline-size: 1.4em;
+  object-fit: contain;
+}
+
 .btn:is(.autocomplete__btn) {
   --btn-border-radius: 0;
   --outline-size: 0 !important;

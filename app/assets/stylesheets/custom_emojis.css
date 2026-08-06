@@ -1,0 +1,43 @@
+.custom-emojis {
+  max-inline-size: 70rem;
+  margin-inline: auto;
+}
+
+.custom-emojis__grid {
+  display: grid;
+  gap: var(--inline-space);
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.custom-emojis__item--inactive {
+  opacity: 0.5;
+}
+
+.custom-emoji {
+  align-items: center;
+  display: inline-flex;
+  line-height: 1;
+  vertical-align: -0.2em;
+}
+
+.custom-emoji__image {
+  block-size: 1.4em;
+  display: block;
+  inline-size: 1.4em;
+  object-fit: contain;
+}
+
+.custom-emoji__image.custom-emojis__preview {
+  block-size: 4rem;
+  inline-size: 4rem;
+}
+
+[data-trix-content-type~="application/vnd.campfire.custom-emoji"] {
+  display: inline-flex;
+  margin: 0;
+  vertical-align: -0.2em;
+
+  .attachment__caption {
+    display: none;
+  }
+}

@@ -15,6 +15,19 @@ class ActionTextAttachmentTest < ActiveSupport::TestCase
     assert_equal @user, attachment.attachable
   end
 
+  test "lookup custom emoji attachable with invalid sgid" do
+    custom_emoji = CustomEmoji.new(account: accounts(:signal), creator: @user, name: "party_parrot")
+    custom_emoji.image.attach io: file_fixture("moon.jpg").open, filename: "moon.jpg", content_type: "image/jpeg"
+    custom_emoji.save!
+    message, _signature = custom_emoji.attachable_sgid.split("--")
+
+    html = %Q(<action-text-attachment sgid="#{message}--invalid"></action-text-attachment>)
+    node = ActionText::Fragment.wrap(html).find_all(ActionText::Attachment.tag_name).first
+
+    attachment = ActionText::Attachment.from_node(node)
+    assert_equal custom_emoji, attachment.attachable
+  end
+
   test "lookup attachable with nil sgid" do
     html = %Q(<action-text-attachment></action-text-attachment>)
     node = ActionText::Fragment.wrap(html).find_all(ActionText::Attachment.tag_name).first
