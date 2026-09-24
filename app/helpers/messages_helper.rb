@@ -57,7 +57,9 @@ module MessagesHelper
     when "sound"
       message_sound_presentation(message)
     else
-      auto_link h(ContentFilters::TextMessagePresentationFilters.apply(message.body.body)), html: { target: "_blank" }
+      auto_link h(ContentFilters::TextMessagePresentationFilters.apply(message.body.body)),
+        html: { target: "_blank" },
+        sanitize_options: { tags: ActionView::Base.sanitized_allowed_tags + [ "campfire-giphy-gif" ] }
     end
   rescue Exception => e
     Sentry.capture_exception(e, extra: { message: message })

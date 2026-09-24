@@ -9,7 +9,7 @@
     <turbo-frame id="composer-frame">
       <%= composer_form_tag(room) do |form| %>
         <fieldset data-composer-target="fields" contents>
-          <div class="flex flex-column">
+          <div class="flex flex-column" data-controller="gif-picker">
             <div class="composer__filelist flex flex--align-center gap flex-wrap" data-composer-target="fileList"></div>
 
             <div class="flex composer__input input input--actor fill-white min-width" style="--input-border-radius: 1.3rem">
@@ -29,8 +29,12 @@
                           rich_autocomplete_emoji_url_value: asset_path("emoji_list.json"),
                           rich_autocomplete_custom_emoji_url_value: autocompletable_custom_emojis_path,
                           permitted_attachment_types: "application/vnd.actiontext.opengraph-embed",
-                          composer_target: "text" } %>
+                          composer_target: "text",
+                          gif_picker_target: "editor" } %>
                 </div>
+
+                <button class="btn btn--borderless txt-small flex-item-no-shrink" type="button"
+                    data-action="gif-picker#open" aria-label="Choose a GIF" aria-haspopup="dialog">GIF</button>
 
                 <label class="btn btn--borderless txt-small flex-item-no-shrink composer__attachment-btn input--file">
                   <%= image_tag "attachment.svg", size: 22, class: "colorize--black", aria: { hidden: "true" } %>
@@ -50,6 +54,7 @@
                 <% end %>
               </div>
             </div>
+            <%= render "rooms/show/gif_picker" %>
           </div>
         </fieldset>
 
