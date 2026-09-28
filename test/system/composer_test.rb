@@ -29,6 +29,69 @@ class ComposerTest < ApplicationSystemTestCase
     assert_composer_empty
   end
 
+  test "shift enter starts a Python code block and plain enter still sends" do
+    type_in_composer "```py"
+    press_in_composer [ :shift, :enter ]
+
+    assert_selector "#composer pre[data-language='py'], #composer pre[data-language='python']"
+    assert_no_selector "#composer.composer--rich-text"
+
+    press_in_composer "print(1)"
+    press_in_composer [ :shift, :enter ]
+    press_in_composer "print(2)"
+
+    assert_selector "#composer pre", text: /print\(1\)\s+print\(2\)/
+    assert_no_message_text "print(1)"
+
+    press_in_composer :enter
+
+    assert_selector last_message_selector("pre"), text: /print\(1\)\s+print\(2\)/
+    assert_composer_empty
+  end
+
+  test "shift enter starts a code block after a soft line break without consuming preceding text" do
+    type_in_composer "Here is the code:"
+    press_in_composer [ :shift, :enter ]
+    press_in_composer "```py"
+    press_in_composer [ :shift, :enter ]
+    press_in_composer "print(1)"
+
+    assert_selector "#composer .lexxy-editor__content > p", text: "Here is the code:"
+    assert_selector "#composer pre", text: "print(1)"
+
+    press_in_composer :enter
+
+    assert_message_text "Here is the code:"
+    assert_selector last_message_selector("pre"), text: "print(1)"
+  end
+
+  test "shift enter accepts a code fence without a language" do
+    type_in_composer "```"
+    press_in_composer [ :shift, :enter ]
+    press_in_composer "plain code"
+
+    assert_selector "#composer pre", text: "plain code"
+  end
+
+  test "shift enter keeps ordinary text as a soft line break" do
+    type_in_composer "line one"
+    press_in_composer [ :shift, :enter ]
+    press_in_composer "line two"
+
+    assert_selector "#composer .lexxy-editor__content > p", count: 1, text: /line one\s*line two/
+    assert_selector "#composer .lexxy-editor__content > p br"
+    assert_no_selector "#composer pre"
+    assert_no_message_text "line one"
+  end
+
+  test "plain enter still sends a literal code fence" do
+    type_in_composer "```py"
+    press_in_composer :enter
+
+    assert_message_text "```py"
+    assert_composer_empty
+  end
+
   test "an unsent message is kept as a draft while hopping between rooms" do
     type_in_composer "Still writing this"
 
