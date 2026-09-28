@@ -43,6 +43,10 @@ class CustomEmoji < ApplicationRecord
     "custom_emojis/attachment"
   end
 
+  def attachable_content_type
+    "application/vnd.campfire.custom-emoji"
+  end
+
   def to_trix_content_attachment_partial_path
     "custom_emojis/attachment"
   end

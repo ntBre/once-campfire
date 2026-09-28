@@ -32,9 +32,10 @@
   inline-size: 4rem;
 }
 
-[data-trix-content-type~="application/vnd.campfire.custom-emoji"] {
+action-text-attachment[content-type~="application/vnd.campfire.custom-emoji"] {
   display: inline-flex;
   margin: 0;
+  padding: 0;
   vertical-align: -0.2em;
 
   .attachment__caption {
