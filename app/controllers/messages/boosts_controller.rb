@@ -1,5 +1,6 @@
 class Messages::BoostsController < ApplicationController
   before_action :set_message
+  before_action :set_boost, only: :destroy
 
   def index
   end
@@ -15,7 +16,6 @@ class Messages::BoostsController < ApplicationController
   end
 
   def destroy
-    @boost = Current.user.boosts.find(params[:id])
     @boost.destroy!
 
     broadcast_remove
@@ -24,6 +24,10 @@ class Messages::BoostsController < ApplicationController
   private
     def set_message
       @message = Current.user.reachable_messages.find(params[:message_id])
+    end
+
+    def set_boost
+      @boost = @message.boosts.find_by!(id: params[:id], booster: Current.user)
     end
 
     def boost_params

@@ -1,0 +1,24 @@
+<% @custom_emojis.each do |custom_emoji| %>
+  <lexxy-prompt-item search="<%= custom_emoji.name %>">
+    <template type="menu">
+      <span class="autocomplete__item flex align-center gap unpad">
+        <%= image_tag custom_emoji_image_path(custom_emoji), class: "autocomplete__emoji-image", alt: "" %>
+        <span><%= ":#{custom_emoji.name}:" %></span>
+      </span>
+    </template>
+    <template type="editor"><%= tag.action_text_attachment sgid: custom_emoji.attachable_sgid,
+      "content-type": custom_emoji.attachable_content_type,
+      content: render("custom_emojis/attachment", custom_emoji: custom_emoji) %></template>
+  </lexxy-prompt-item>
+<% end %>
+<% @unicode_emojis.each do |emoji| %>
+  <lexxy-prompt-item search="<%= emoji["name"] %>">
+    <template type="menu">
+      <span class="autocomplete__item flex align-center gap unpad">
+        <span class="autocomplete__emoji" aria-hidden="true"><%= emoji["emoji"] %></span>
+        <span><%= emoji["label"] %></span>
+      </span>
+    </template>
+    <template type="editor"><%= emoji["emoji"] %></template>
+  </lexxy-prompt-item>
+<% end %>

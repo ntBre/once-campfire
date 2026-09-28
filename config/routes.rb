@@ -58,6 +58,7 @@ Rails.application.routes.draw do
   end
 
   namespace :autocompletable do
+    resources :emojis, only: :index
     resources :custom_emojis, only: :index, defaults: { format: :json }
     resources :users, only: :index
   end
@@ -69,7 +70,13 @@ Rails.application.routes.draw do
   resources :rooms do
     resources :messages
 
-    post ":bot_key/messages", to: "messages/by_bots#create", as: :bot_messages
+    nested do
+      scope path: ":bot_key", as: :bot, defaults: { format: :json } do
+        resources :messages, controller: "messages/by_bots", only: %i[ index create update destroy ] do
+          resources :boosts, controller: "messages/boosts/by_bots", only: %i[ create destroy ]
+        end
+      end
+    end
 
     scope module: "rooms" do
       resource :refresh, only: :show
