@@ -33,14 +33,15 @@ class ComposerTest < ApplicationSystemTestCase
     type_in_composer "```py"
     press_in_composer [ :shift, :enter ]
 
-    assert_selector "#composer pre[data-language='py'], #composer pre[data-language='python']"
+    # Lexxy uses <code> while editing and serializes code blocks as <pre>.
+    assert_selector "#composer .lexxy-editor__content > code[data-language='py'], #composer .lexxy-editor__content > code[data-language='python']"
     assert_no_selector "#composer.composer--rich-text"
 
     press_in_composer "print(1)"
     press_in_composer [ :shift, :enter ]
     press_in_composer "print(2)"
 
-    assert_selector "#composer pre", text: /print\(1\)\s+print\(2\)/
+    assert_selector "#composer .lexxy-editor__content > code", text: /print\(1\)\s+print\(2\)/
     assert_no_message_text "print(1)"
 
     press_in_composer :enter
@@ -57,7 +58,7 @@ class ComposerTest < ApplicationSystemTestCase
     press_in_composer "print(1)"
 
     assert_selector "#composer .lexxy-editor__content > p", text: "Here is the code:"
-    assert_selector "#composer pre", text: "print(1)"
+    assert_selector "#composer .lexxy-editor__content > code", text: "print(1)"
 
     press_in_composer :enter
 
@@ -70,7 +71,7 @@ class ComposerTest < ApplicationSystemTestCase
     press_in_composer [ :shift, :enter ]
     press_in_composer "plain code"
 
-    assert_selector "#composer pre", text: "plain code"
+    assert_selector "#composer .lexxy-editor__content > code", text: "plain code"
   end
 
   test "shift enter keeps ordinary text as a soft line break" do
@@ -79,8 +80,8 @@ class ComposerTest < ApplicationSystemTestCase
     press_in_composer "line two"
 
     assert_selector "#composer .lexxy-editor__content > p", count: 1, text: /line one\s*line two/
-    assert_selector "#composer .lexxy-editor__content > p br"
-    assert_no_selector "#composer pre"
+    assert_selector "#composer .lexxy-editor__content > p br", visible: :all
+    assert_no_selector "#composer .lexxy-editor__content > code"
     assert_no_message_text "line one"
   end
 
