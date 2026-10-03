@@ -36,6 +36,27 @@ class GiphyGifTest < ActiveSupport::TestCase
     assert_not_includes html, "evil.test"
   end
 
+  test "Lexxy content survives storage and is rendered from validated metadata" do
+    content = '<campfire-giphy-gif href="https://giphy.com/gifs/abc123"><a>Happy dog</a><img src="https://evil.test/a.gif"></campfire-giphy-gif>'
+    body = %(<action-text-attachment content-type="application/vnd.campfire.giphy-gif" content="#{ERB::Util.html_escape(content)}"></action-text-attachment>)
+    message = Message.create! room: rooms(:pets), creator: users(:jason), body: body
+
+    assert_equal "[GIF] Happy dog", message.reload.plain_text_body
+    assert_equal "abc123", message.body.body.attachments.sole.attachable.gif_id
+    assert_includes message.body.to_trix_html, "https://giphy.com/gifs/abc123"
+    assert_not_includes ApplicationController.helpers.message_presentation(message), "evil.test"
+  end
+
+  test "Lexxy content rejects non-GIPHY links and missing metadata" do
+    [ '<campfire-giphy-gif href="https://evil.test/gifs/abc123">Dog</campfire-giphy-gif>',
+      '<a href="https://giphy.com/gifs/abc123">Dog</a>', "" ].each do |content|
+      node = Nokogiri::HTML.fragment(attachment_html).at_css("action-text-attachment")
+      node.remove_attribute("href")
+      node["content"] = content
+      assert_nil ActionText::Attachment::GiphyGif.from_node(node)
+    end
+  end
+
   private
     def attachment_html(href: "https://giphy.com/gifs/abc123")
       %(<action-text-attachment content-type="application/vnd.campfire.giphy-gif" href="#{href}" filename="Happy dog"></action-text-attachment>)

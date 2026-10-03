@@ -37,7 +37,11 @@ class MessagesController < ApplicationController
     @message.update!(message_params)
 
     @message.broadcast_replace_to @room, :messages, target: [ @message, :presentation ], partial: "messages/presentation", attributes: { maintain_scroll: true }
-    redirect_to room_message_url(@room, @message)
+
+    respond_to do |format|
+      format.html { redirect_to room_message_url(@room, @message) }
+      format.json { render :show }
+    end
   end
 
   def destroy

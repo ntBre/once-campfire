@@ -19,8 +19,8 @@ class SendingGifsTest < ApplicationSystemTestCase
 
     find(".gif-picker__result").click
     assert_no_selector "dialog[open]"
-    assert_selector "trix-editor .giphy-gif"
-    assert_no_match(/media\.giphy\.com/, find('input[name="message[body]"]', visible: false).value)
+    assert_selector "lexxy-editor .giphy-gif"
+    assert_no_match(/media\.giphy\.com/, find("lexxy-editor").evaluate_script("this.value"))
 
     click_on "send"
     assert_selector ".message[data-message-id] .giphy-gif"
@@ -31,9 +31,9 @@ class SendingGifsTest < ApplicationSystemTestCase
     within_message message do
       reveal_message_actions
       find(".message__edit-btn").click
-      assert_selector "trix-editor .giphy-gif"
+      assert_selector "lexxy-editor .giphy-gif"
       click_on "Save changes"
-      assert_no_selector "trix-editor"
+      assert_no_selector "lexxy-editor"
     end
 
     Rails.configuration.x.giphy.stubs(:api_key).returns(nil)
@@ -44,13 +44,27 @@ class SendingGifsTest < ApplicationSystemTestCase
     assert_not_includes message.reload.body.body.to_html, "media.giphy.com"
   end
 
+  test "inserting a GIF preserves the cursor position and can be undone" do
+    type_in_composer "Before after"
+    5.times { press_in_composer :left }
+    click_on "Choose a GIF"
+    find(".gif-picker__result").click
+    assert_selector "lexxy-editor .giphy-gif"
+    body = find("lexxy-editor").evaluate_script("this.value")
+    assert_match(/Before .*action-text-attachment.*after/m, body)
+
+    press_in_composer [ :control, "z" ]
+    assert_no_selector "lexxy-editor .giphy-gif"
+    assert_composer_text "Before after"
+  end
+
   test "a quota error can be dismissed without losing the message draft" do
     fill_in_rich_text_area "message_body", with: "Keep this draft"
     page.execute_script "window.giphyStatus = 429"
     click_on "Choose a GIF"
     assert_text "GIPHY's hourly limit has been reached"
     click_on "Close GIF picker"
-    assert_selector "trix-editor", text: "Keep this draft"
+    assert_selector "lexxy-editor", text: "Keep this draft"
   end
 
   test "a missing key explains why GIF search is unavailable" do

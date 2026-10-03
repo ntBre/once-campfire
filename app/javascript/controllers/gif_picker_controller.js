@@ -1,3 +1,4 @@
+import { Lexical } from "lexxy"
 import { Controller } from "@hotwired/stimulus"
 import { GIF_CONTENT_TYPE, gifUrl, mediaUrl, request } from "lib/giphy"
 
@@ -9,7 +10,7 @@ export default class extends Controller {
   }
 
   open() {
-    this.selection = this.editorTarget.editor.getSelectedRange()
+    this.selection = this.editorTarget.editor.getEditorState().read(() => Lexical.$getSelection()?.clone())
     this.dialogTarget.showModal()
     this.queryTarget.focus()
     this.search()
@@ -114,12 +115,14 @@ export default class extends Controller {
     link.rel = "noopener noreferrer"
     content.append(link)
 
-    const editor = this.editorTarget.editor
-    editor.setSelectedRange(this.selection)
-    editor.recordUndoEntry("Insert GIF")
-    editor.insertAttachment(new Trix.Attachment({
-      contentType: GIF_CONTENT_TYPE, href, filename: gif.title || "GIF on GIPHY", content: content.outerHTML
-    }))
+    const attachment = document.createElement("action-text-attachment")
+    attachment.setAttribute("content-type", GIF_CONTENT_TYPE)
+    attachment.setAttribute("content", content.outerHTML)
+
+    this.editorTarget.editor.update(() => {
+      if (this.selection) Lexical.$setSelection(this.selection)
+      this.editorTarget.contents.insertHtml(attachment.outerHTML)
+    }, { tag: "history-push" })
     this.close()
   }
 }

@@ -10,7 +10,9 @@ class ActionText::Attachment::GiphyGif
 
   def self.from_node(node)
     if node["content-type"] == CONTENT_TYPE
-      attachment = new(href: node["href"], filename: node["filename"])
+      # Lexxy stores custom attachment details in content; keep reading Trix attributes too.
+      content = Nokogiri::HTML.fragment(node["content"].to_s).at_css("campfire-giphy-gif")
+      attachment = new(href: node["href"] || content&.[]("href"), filename: node["filename"] || content&.text&.strip)
       attachment if attachment.valid?
     end
   end

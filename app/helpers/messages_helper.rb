@@ -1,4 +1,9 @@
 module MessagesHelper
+  # auto_link re-sanitizes with Rails' default safe list, which lacks the
+  # formatting the rich text editor produces
+  AUTO_LINK_ALLOWED_TAGS = Rails::HTML5::SafeListSanitizer.allowed_tags + ContentFilters::EDITOR_FORMATTING_TAGS
+  AUTO_LINK_ALLOWED_ATTRIBUTES = Rails::HTML5::SafeListSanitizer.allowed_attributes + ContentFilters::EDITOR_FORMATTING_ATTRIBUTES
+
   def message_area_tag(room, &)
     tag.div id: "message-area", class: "message-area", contents: true, data: {
       controller: "messages presence drop-target",
@@ -58,8 +63,7 @@ module MessagesHelper
       message_sound_presentation(message)
     else
       auto_link h(ContentFilters::TextMessagePresentationFilters.apply(message.body.body)),
-        html: { target: "_blank" },
-        sanitize_options: { tags: ActionView::Base.sanitized_allowed_tags + [ "campfire-giphy-gif" ] }
+        html: { target: "_blank" }, sanitize_options: { tags: AUTO_LINK_ALLOWED_TAGS + [ "campfire-giphy-gif" ], attributes: AUTO_LINK_ALLOWED_ATTRIBUTES }
     end
   rescue Exception => e
     Sentry.capture_exception(e, extra: { message: message })

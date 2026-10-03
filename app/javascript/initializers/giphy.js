@@ -1,8 +1,6 @@
 import { apiKey, loadGif, mediaUrl } from "lib/giphy"
 
-Trix.config.dompurify.ADD_TAGS = [ ...(Trix.config.dompurify.ADD_TAGS || []), "campfire-giphy-gif" ]
-
-// Shadow DOM keeps temporary media URLs out of Trix/Action Text serialization.
+// Shadow DOM keeps temporary media URLs out of Lexxy/Action Text serialization.
 class GiphyGif extends HTMLElement {
   connectedCallback() {
     this.generation = (this.generation || 0) + 1

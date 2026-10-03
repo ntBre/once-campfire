@@ -19,22 +19,25 @@
                 <div class="flex flex-column flex-item-grow min-width gap">
                   <%= form.rich_text_area :body,
                         rows: 1,
-                        class: "input",
+                        class: "input lexxy-content",
                         style: "order: -1",
                         aria: { multiline: "true", label: "Write a message" },
+                        "permitted-attachment-types": "application/vnd.campfire.mention application/vnd.campfire.custom-emoji application/vnd.actiontext.opengraph-embed application/vnd.campfire.giphy-gif",
                         data: {
-                          controller: "rich-autocomplete",
-                          action: rich_text_data_actions,
-                          rich_autocomplete_url_value: autocompletable_users_path(room_id: room.id),
-                          rich_autocomplete_emoji_url_value: asset_path("emoji_list.json"),
-                          rich_autocomplete_custom_emoji_url_value: autocompletable_custom_emojis_path,
-                          permitted_attachment_types: "application/vnd.actiontext.opengraph-embed",
+                          controller: "unfurl",
+                          action: "#{rich_text_data_actions} lexxy:change->composer#saveDraft lexxy:insert-link->unfurl#unfurl",
                           composer_target: "text",
-                          gif_picker_target: "editor" } %>
+                          gif_picker_target: "editor" } do %>
+                    <%= mention_prompt_tag room %>
+                    <%= emoji_prompt_tag %>
+                  <% end %>
                 </div>
 
                 <button class="btn btn--borderless txt-small flex-item-no-shrink" type="button"
-                    data-action="gif-picker#open" aria-label="Choose a GIF" aria-haspopup="dialog">GIF</button>
+                    data-action="gif-picker#open" aria-haspopup="dialog">
+                  <span aria-hidden="true">GIF</span>
+                  <span class="for-screen-reader">Choose a GIF</span>
+                </button>
 
                 <label class="btn btn--borderless txt-small flex-item-no-shrink composer__attachment-btn input--file">
                   <%= image_tag "attachment.svg", size: 22, class: "colorize--black", aria: { hidden: "true" } %>
