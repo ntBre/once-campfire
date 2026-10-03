@@ -9,7 +9,7 @@
     <turbo-frame id="composer-frame">
       <%= composer_form_tag(room) do |form| %>
         <fieldset data-composer-target="fields" contents>
-          <div class="flex flex-column">
+          <div class="flex flex-column" data-controller="gif-picker">
             <div class="composer__filelist flex flex--align-center gap flex-wrap" data-composer-target="fileList"></div>
 
             <div class="flex composer__input input input--actor fill-white min-width" style="--input-border-radius: 1.3rem">
@@ -22,15 +22,22 @@
                         class: "input lexxy-content",
                         style: "order: -1",
                         aria: { multiline: "true", label: "Write a message" },
-                        "permitted-attachment-types": "application/vnd.campfire.mention application/vnd.campfire.custom-emoji application/vnd.actiontext.opengraph-embed",
+                        "permitted-attachment-types": "application/vnd.campfire.mention application/vnd.campfire.custom-emoji application/vnd.actiontext.opengraph-embed application/vnd.campfire.giphy-gif",
                         data: {
                           controller: "unfurl",
                           action: "#{rich_text_data_actions} lexxy:change->composer#saveDraft lexxy:insert-link->unfurl#unfurl",
-                          composer_target: "text" } do %>
+                          composer_target: "text",
+                          gif_picker_target: "editor" } do %>
                     <%= mention_prompt_tag room %>
                     <%= emoji_prompt_tag %>
                   <% end %>
                 </div>
+
+                <button class="btn btn--borderless txt-small flex-item-no-shrink" type="button"
+                    data-action="gif-picker#open" aria-haspopup="dialog">
+                  <span aria-hidden="true">GIF</span>
+                  <span class="for-screen-reader">Choose a GIF</span>
+                </button>
 
                 <label class="btn btn--borderless txt-small flex-item-no-shrink composer__attachment-btn input--file">
                   <%= image_tag "attachment.svg", size: 22, class: "colorize--black", aria: { hidden: "true" } %>
@@ -50,6 +57,7 @@
                 <% end %>
               </div>
             </div>
+            <%= render "rooms/show/gif_picker" %>
           </div>
         </fieldset>
 

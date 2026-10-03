@@ -14,6 +14,7 @@ export default class CampfireRichTextExtension extends Lexxy.Extension {
       "figure",
       "figcaption",
       "actiontext-opengraph-embed",
+      { tag: "campfire-giphy-gif", attributes: [ "href" ] },
       { tag: "div", attributes: [ "sgid" ] },
       { tag: "span", attributes: [ "sgid" ] },
       { tag: "img", attributes: [ "alt" ] },

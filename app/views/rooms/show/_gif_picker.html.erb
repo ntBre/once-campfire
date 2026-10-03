@@ -1,0 +1,27 @@
+<dialog class="gif-picker border-radius border shadow" aria-labelledby="gif-picker-title"
+    data-gif-picker-target="dialog" data-action="close->gif-picker#closed click->gif-picker#backdropClick keydown->gif-picker#stopPropagation">
+  <div class="flex align-center justify-space-between gap">
+    <strong id="gif-picker-title">Choose a GIF</strong>
+    <button type="button" class="btn btn--borderless" data-action="gif-picker#close">
+      <span aria-hidden="true">✕</span>
+      <span class="for-screen-reader">Close GIF picker</span>
+    </button>
+  </div>
+
+  <div class="flex gap margin-block">
+    <label for="gif-picker-query" class="for-screen-reader">Search GIFs</label>
+    <input id="gif-picker-query" type="search" class="input flex-item-grow min-width" aria-label="Search GIFs" placeholder="Search GIPHY"
+        maxlength="50" autofocus data-gif-picker-target="query" data-action="keydown.enter->gif-picker#search:prevent">
+    <button type="button" class="btn" data-action="gif-picker#search">Search</button>
+  </div>
+
+  <p role="status" class="txt-small" data-gif-picker-target="status"></p>
+  <div class="gif-picker__results" data-gif-picker-target="results" aria-label="GIF results" aria-busy="false"></div>
+  <button type="button" class="btn center margin-block" data-gif-picker-target="more" data-action="gif-picker#more" hidden>Load more</button>
+  <a href="https://giphy.com" target="_blank" rel="noopener noreferrer" class="gif-picker__attribution">
+    <picture>
+      <%= tag.source srcset: asset_path("giphy-attribution-dark.png"), media: "(prefers-color-scheme: dark)" %>
+      <%= image_tag "giphy-attribution-light.png", alt: "Powered by GIPHY", width: 200, height: 42 %>
+    </picture>
+  </a>
+</dialog>

@@ -1,0 +1,60 @@
+.gif-picker {
+  box-sizing: border-box;
+  background: var(--color-bg);
+  color: var(--color-text);
+  inline-size: 28rem;
+  max-inline-size: calc(100dvw - 2rem);
+  max-block-size: 75dvh;
+  margin: auto;
+  padding: 1rem;
+  overflow-y: auto;
+
+  &::backdrop {
+    background: rgb(0 0 0 / 45%);
+  }
+
+  [hidden] {
+    display: none;
+  }
+}
+
+.gif-picker__results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.gif-picker__result {
+  border-radius: 0.4rem;
+  cursor: pointer;
+  min-inline-size: 0;
+  padding: 0;
+  overflow: hidden;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: 8rem;
+    object-fit: contain;
+  }
+}
+
+.gif-picker__attribution {
+  display: block;
+  inline-size: fit-content;
+  margin: 1rem auto 0;
+
+  img {
+    block-size: auto;
+  }
+}
+
+.giphy-gif {
+  display: inline-block;
+  max-inline-size: 100%;
+}
+
+.giphy-gif__link {
+  display: block;
+  font-size: 0.8rem;
+}

@@ -63,7 +63,7 @@ module MessagesHelper
       message_sound_presentation(message)
     else
       auto_link h(ContentFilters::TextMessagePresentationFilters.apply(message.body.body)),
-        html: { target: "_blank" }, sanitize_options: { tags: AUTO_LINK_ALLOWED_TAGS, attributes: AUTO_LINK_ALLOWED_ATTRIBUTES }
+        html: { target: "_blank" }, sanitize_options: { tags: AUTO_LINK_ALLOWED_TAGS + [ "campfire-giphy-gif" ], attributes: AUTO_LINK_ALLOWED_ATTRIBUTES }
     end
   rescue Exception => e
     Sentry.capture_exception(e, extra: { message: message })

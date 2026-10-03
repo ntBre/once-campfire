@@ -2,7 +2,7 @@ ActiveSupport.on_load(:action_text_content) do
   class ActionText::Attachment
     class << self
       def from_node(node, attachable = nil)
-        new(node, attachable || ActionText::Attachment::OpengraphEmbed.from_node(node) || attachable_from_possibly_expired_sgid(node["sgid"]) || ActionText::Attachable.from_node(node))
+        new(node, attachable || ActionText::Attachment::GiphyGif.from_node(node) || ActionText::Attachment::OpengraphEmbed.from_node(node) || attachable_from_possibly_expired_sgid(node["sgid"]) || ActionText::Attachable.from_node(node))
       end
 
       private
