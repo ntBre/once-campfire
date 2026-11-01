@@ -12,7 +12,7 @@ gem "sqlite3"
 gem "redis", "~> 5.4"
 
 # Deployment
-gem "puma", "~> 7.2", ">= 7.2.1"
+gem "puma", "~> 8.0"
 
 # Jobs
 gem "resque", "~> 2.7.0"
@@ -43,7 +43,6 @@ gem "rqrcode"
 gem "rails_autolink"
 gem "geared_pagination"
 gem "jbuilder"
-gem "net-http-persistent"
 gem "surfguard", github: "basecamp/surfguard" # The SSRF address policy behind RestrictedHTTP
 gem "kredis"
 gem "platform_agent"
