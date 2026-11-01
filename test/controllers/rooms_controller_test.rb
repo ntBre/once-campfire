@@ -15,6 +15,21 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show renders notification help for each platform" do
+    {
+      "Firefox on Android" => "Mozilla/5.0 (Android 14; Mobile; rv:131.0) Gecko/131.0 Firefox/131.0",
+      "Chrome on Android" => "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36",
+      "Firefox on desktop" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0",
+      "Chrome on desktop" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+      "Safari on macOS" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
+    }.each do |platform, user_agent|
+      get room_url(users(:david).rooms.last), headers: { "User-Agent" => user_agent }
+
+      assert_response :success, platform
+      assert_select ".notifications-help ol", { minimum: 1 }, platform
+    end
+  end
+
   test "shows records the last room visited in a cookie" do
     get room_url(users(:david).rooms.last)
     assert response.cookies[:last_room] = users(:david).rooms.last.id
@@ -68,9 +83,22 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
   test "destroy" do
     assert_turbo_stream_broadcasts :rooms, count: 1 do
       assert_difference -> { Room.count }, -1 do
-        delete room_url(rooms(:designers))
+        perform_enqueued_jobs { delete room_url(rooms(:designers)) }
       end
     end
+  end
+
+  test "destroy takes the room away from its members at once and leaves its messages to a job" do
+    room = rooms(:designers)
+    member_ids = room.memberships.pluck(:user_id)
+
+    assert_enqueued_with(job: Room::DestroyJob, args: [ room, member_ids ]) do
+      assert_no_difference -> { Message.count } do
+        delete room_url(room)
+        assert_redirected_to root_url
+      end
+    end
+    assert_empty room.memberships.reload
   end
 
   test "destroy only allowed for creators or those who can administer" do
@@ -84,7 +112,7 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
     rooms(:designers).update! creator: users(:jz)
 
     assert_difference -> { Room.count }, -1 do
-      delete room_url(rooms(:designers))
+      perform_enqueued_jobs { delete room_url(rooms(:designers)) }
     end
   end
 

@@ -7,7 +7,7 @@ module Authentication
     before_action :deny_bots
     helper_method :signed_in?
 
-    protect_from_forgery with: :exception, unless: -> { authenticated_by.bot_key? }
+    protect_from_forgery using: :header_only, with: :exception, unless: -> { authenticated_by.bot_key? }
   end
 
   class_methods do
@@ -57,7 +57,7 @@ module Authentication
     end
 
     def start_new_session_for(user)
-      user.sessions.start!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
+      user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         authenticated_as session
       end
     end
